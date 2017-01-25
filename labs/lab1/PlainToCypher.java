@@ -10,7 +10,7 @@
 import java.util.Scanner;
 
 public class PlainToCypher {
-
+  public static final int ASCII_OFFSET = 97;
   public static void main(String[] args) {
     while(true) {
       Scanner input = new Scanner(System.in);
@@ -30,7 +30,7 @@ public class PlainToCypher {
     int[] result = new int[inputStr.length()];
     char[] inputAsChars = inputStr.toCharArray();
     for (int index = 0; index < inputAsChars.length; index++) {
-      result[index] = ((int) inputAsChars[index]) -97;
+      result[index] = ((int) inputAsChars[index]) - PlainToCypher.ASCII_OFFSET;
     }
     return result;
   }
