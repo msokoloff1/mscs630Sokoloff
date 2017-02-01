@@ -18,7 +18,7 @@ public class EuclideanAlgorithm {
     while(input.hasNext()) {
       line = input.nextLine();
       numbers = line.split(" ");
-      assert numbers.length == 2 : "Numbers of elements per line is not 2";
+      assert numbers.length == 2 : "Number of elements per line is not 2";
       System.out.println(EuclideanAlgorithm.euclidAlgExt(Long.parseLong(numbers[0]),Long.parseLong(numbers[1])));   
     }  
 
