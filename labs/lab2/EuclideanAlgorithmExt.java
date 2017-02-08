@@ -34,7 +34,6 @@ public class EuclideanAlgorithmExt {
       x = EuclideanAlgorithmExt.updateValue(x[1], x[0], q);
       y = EuclideanAlgorithmExt.updateValue(y[1], y[0], q);
       r = EuclideanAlgorithmExt.updateValue(r[1], r[0], q);
-
     }
     long[] result = {r[1], x[1], y[1]};
     return result;
