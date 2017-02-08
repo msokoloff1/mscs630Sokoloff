@@ -1,7 +1,7 @@
 /*
 *Matt Sokoloff
 *MSCS630
-*Lab 2
+*Lab 2 (part 1)
 *
 *This program applies the euclidean algorithm to a given input.
 *
