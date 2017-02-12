@@ -32,11 +32,19 @@ def getBobAliceLoss(bob, eve, alice, messageLength):
     return totalLoss
 
 
+def getLoggingMetrics(bob, eve, alice):
+    eveOutput = ensureRank2(eve.output)
+    answer = ensureRank2(alice._inputMessage)
+    bobOutput = ensureRank2(bob.output)
+    eveIncorrect = tf.reduce_mean(tf.abs(eveOutput - answer))
+    bobIncorrect = tf.reduce_mean(tf.abs(bobOutput - answer))
+    return [eveIncorrect, bobIncorrect]
+
 
 def getEveLoss(eve, alice):
     eveOutput = ensureRank2(eve.output)
-    aliceOutput = ensureRank2(alice._inputMessage)
-    eveLoss = tf.abs(eveOutput - aliceOutput)
+    answer = ensureRank2(alice._inputMessage)
+    eveLoss = tf.abs(eveOutput - answer)
 
     return eveLoss
 

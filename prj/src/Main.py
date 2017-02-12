@@ -43,7 +43,8 @@ turnGen = utils.getTurn(  alice.getUpdateOp(aliceAndBobLoss, optimizer)
 
 def train(numIters):
     with tf.Session() as sess:
-        dataGen = utils.getData(args.message_length, args.batch_size)
+        dataGen    = utils.getData(args.message_length, args.batch_size)
+        logMetrics = utils.getLoggingMetrics(bob, eve, alice)
         sess.run(tf.initialize_all_variables())
         for iter in range(args.num_iters):
 
@@ -54,13 +55,12 @@ def train(numIters):
                 , alice._inputMessage : np.array(data['plainText'])
             }
 
-
             updateOps = next(turnGen)
             sess.run(updateOps, feed_dict=feedDict)
 
             if(iter%100 == 0):
-                aliceAndBobLossEvaluated,eveLossEvaluated =  sess.run([tf.reduce_mean(aliceAndBobLoss),tf.reduce_mean(eveLoss)], feed_dict=feedDict)
-                print("Iteration %s | Alice/Bob Loss : %g | Eve Loss : %g"%(str(iter).zfill(6),aliceAndBobLossEvaluated, eveLossEvaluated))
+                aliceAndBobLossEvaluated,eveLossEvaluated,eveIncorrect, bobIncorrect  =  sess.run([tf.reduce_mean(aliceAndBobLoss),tf.reduce_mean(eveLoss)] + logMetrics, feed_dict=feedDict)
+                print("Iteration %s | Alice/Bob Loss : %g | Eve Loss : %g | Eve Incorrect : %g | Bob Incorrect : %g"%(str(iter).zfill(6),aliceAndBobLossEvaluated, eveLossEvaluated,eveIncorrect,bobIncorrect))
 
 
 train(args.num_iters)
