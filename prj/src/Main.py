@@ -2,7 +2,7 @@ import argparse
 import tensorflow as tf
 import Networks as nets
 import Utilities as utils
-
+import numpy as np
 
 
 parser = argparse.ArgumentParser()
@@ -17,8 +17,10 @@ args = parser.parse_args()
 optimizer = tf.train.AdamOptimizer(args.learning_rate)
 if(args.optimizer.lower() == 'adadelta'):
     optimizer = tf.train.AdadeltaOptimizer(args.learning_rate)
+
 elif(args.optimizer.lower() == 'adagrad'):
     optimizer = tf.train.AdagradOptimizer(args.learning_rate)
+
 elif(args.optimizer.lower() == 'rmsprop'):
     optimizer = tf.train.RMSPropOptimizer(args.learning_rate)
 
@@ -26,8 +28,6 @@ elif(args.optimizer.lower() == 'rmsprop'):
 alice = nets.Alice(args.message_length , 'aliceNet')
 bob   = nets.Bob(args.message_length   , alice ,'aliceNet')
 eve   = nets.Eve(args.message_length   , alice ,'aliceNet')
-
-
 
 #Calculate loss metrics
 aliceAndBobLoss =utils.getBobAliceLoss(bob, eve, alice, args.message_length)
@@ -43,20 +43,23 @@ turnGen = utils.getTurn(  alice.getUpdateOp(aliceAndBobLoss, optimizer)
 
 def train(numIters):
     with tf.Session() as sess:
+        dataGen = utils.getData(args.message_length, args.batch_size)
+        sess.run(tf.initialize_all_variables())
         for iter in range(args.num_iters):
-            data = utils.getData(args.message_length, args.batch_size)
+
+            data = next(dataGen)
+
             feedDict = {
-                  alice._inputKey     : data['key']
-                , alice._inputMessage : data['key']
+                  alice._inputKey     : np.array(data['key'])
+                , alice._inputMessage : np.array(data['plainText'])
             }
+
             updateOps = next(turnGen)
             sess.run(updateOps, feed_dict=feedDict)
 
             if(iter%100 == 0):
-                aliceAndBobLossEvaluated,eveLossEvaluated =  sess.run(aliceAndBobLoss,eveLoss, feed_dict=feedDict)
-                print("Iteration %d | Alice/Bob Loss : %g | Eve Loss : %g"%(iter,aliceAndBobLossEvaluated, eveLossEvaluated))
-
-
+                aliceAndBobLossEvaluated,eveLossEvaluated =  sess.run([tf.reduce_mean(aliceAndBobLoss),tf.reduce_mean(eveLoss)], feed_dict=feedDict)
+                print("Iteration %s | Alice/Bob Loss : %g | Eve Loss : %g"%(str(iter).zfill(6),aliceAndBobLossEvaluated, eveLossEvaluated))
 
 
 train(args.num_iters)
