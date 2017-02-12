@@ -16,6 +16,8 @@ class Network():
             if (bias):
                 conv = conv + self._bias(numOutputChannels)
 
+
+
             return activation(conv)
 
     def _weightVar(self, shape):
@@ -24,7 +26,9 @@ class Network():
 
     def _fcLayer(self, input, numOutputs, name, bias = False, activation = tf.nn.sigmoid):
         with tf.variable_scope(name) as scope:
+
             input = utils.ensureRank2(input)
+
             shape1 = int(input.get_shape()[-1])
             weights = self._weightVar((int(shape1), int(numOutputs)))
             result = tf.matmul(input, weights)
@@ -61,8 +65,8 @@ class Network():
 class Alice(Network):
     def __init__(self, messageLength, name):
         super().__init__(messageLength,name)
-        print("ALICE")
-        self._inputKey = tf.placeholder(tf.float32, [None, messageLength])
+        print("Alice Instantiated")
+        self._inputKey = tf.placeholder(tf.float32, [None, messageLength], name ="alicePH")
         combinedInput = self._combineKeyAndText(self._inputKey, messageLength)
         with tf.variable_scope(name) as scope:
             fc1 = self._fcLayer(combinedInput, messageLength * 2, 'a_fc1')
@@ -70,15 +74,13 @@ class Alice(Network):
             conv2 = self._convLayer1D(conv1, numOutputChannels=4, filterWidth=2, stride=2, name='a_conv2')
             conv3 = self._convLayer1D(conv2, numOutputChannels=4, filterWidth=1, stride=1, name='a_conv3')
             conv4 = self._convLayer1D(conv3, numOutputChannels=1, filterWidth=1, stride=1, name='a_conv4', activation = tf.nn.tanh)
-            print("ALICE OUTPUT SHAPE")
-            print(conv4.get_shape())
             self.output = conv4
 
 
 class Bob(Network):
     def __init__(self, messageLength, alice,  name):
         super().__init__(messageLength,name)
-        print("BOB")
+        print("Bob Instantiated")
         self._inputMessage = alice.output
         self._inputKey = alice._inputKey
         combinedInput = self._combineKeyAndText(self._inputKey, messageLength)
@@ -88,19 +90,18 @@ class Bob(Network):
             conv2 = self._convLayer1D(conv1, numOutputChannels=4, filterWidth=2, stride=2, name='b_conv2')
             conv3 = self._convLayer1D(conv2, numOutputChannels=4, filterWidth=1, stride=1, name='b_conv3')
             conv4 = self._convLayer1D(conv3, numOutputChannels=1, filterWidth=1, stride=1, name='b_conv4', activation = tf.nn.tanh)
-            print("BOB OUTPUT")
-            print(conv4.get_shape())
             self.output = conv4
 
 class Eve(Network):
     def __init__(self, messageLength, alice, name):
         super().__init__(messageLength, name)
-        self._inputMessage = alice.output
-        print("EVE")
+        print("Eve Instantiated")
+        self._inputMessage = utils.ensureRank2(alice.output)
         with tf.variable_scope(name) as scope:
             fc1 = self._fcLayer(self._inputMessage, messageLength*2, 'e_fc1')
             conv1 = self._convLayer1D(fc1, numOutputChannels=2, filterWidth=4, stride=1, name='e_conv1')
             conv2 = self._convLayer1D(conv1, numOutputChannels=4, filterWidth=2, stride=2, name='e_conv2')
             conv3 = self._convLayer1D(conv2, numOutputChannels=4, filterWidth=1, stride=1, name='e_conv3')
             conv4 = self._convLayer1D(conv3, numOutputChannels=1, filterWidth=1, stride=1, name='e_conv4', activation = tf.nn.tanh)
+
             self.output = conv4

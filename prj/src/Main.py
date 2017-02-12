@@ -54,6 +54,7 @@ def train(numIters):
                 , alice._inputMessage : np.array(data['plainText'])
             }
 
+
             updateOps = next(turnGen)
             sess.run(updateOps, feed_dict=feedDict)
 

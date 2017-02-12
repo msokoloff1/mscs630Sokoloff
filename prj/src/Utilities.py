@@ -25,6 +25,7 @@ def getBobAliceLoss(bob, eve, alice, messageLength):
     eveOutput = ensureRank2(eve.output)
 
     conversationLoss = tf.abs(bobOutput - alice._inputMessage)
+
     eveLoss = tf.reduce_mean(tf.abs(eveOutput - alice._inputMessage))
     snoopLoss = tf.reduce_mean(tf.div(tf.pow( ((messageLength/2)-eveLoss),2), tf.pow((messageLength/2),2)))
     totalLoss = conversationLoss + snoopLoss
@@ -33,7 +34,10 @@ def getBobAliceLoss(bob, eve, alice, messageLength):
 
 
 def getEveLoss(eve, alice):
-    eveLoss = tf.abs(eve.output - alice._inputMessage)
+    eveOutput = ensureRank2(eve.output)
+    aliceOutput = ensureRank2(alice._inputMessage)
+    eveLoss = tf.abs(eveOutput - aliceOutput)
+
     return eveLoss
 
 
