@@ -37,6 +37,11 @@ public class Determinant{
     }
     
     int finalValue = cofModDet(mod,matrix);
+    
+    while(finalValue < 0) {
+      finalValue += mod;
+    }
+
     System.out.println("Original Matrix:");
     System.out.println(Arrays.deepToString(matrix));
     System.out.println("The determinant of your matrix in mod " + mod + " is : " + finalValue);
