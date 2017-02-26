@@ -1,5 +1,12 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package faround;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -48,13 +55,11 @@ public class Determinant{
   }
 
   public static int cofRecursive(int m, ArrayList<int[][]> A) {
-    
     boolean reducing = true;
     int result = 0;
     
     while(reducing){
       ArrayList<int[][]> expanded = new ArrayList<int[][]>();
-      
       
       
     //For each matrix, expand and add to expanded. Then return the result
@@ -71,20 +76,20 @@ public class Determinant{
           int scaler = matrix[0][colIndex];// * ( (-1) ^colIndex);
           int[][] newMatrix = new int[matrix.length-1][matrix.length-1];
             //Iterate over all columns again. Do not include the current column
-            for(int colIndexNest = 0; colIndexNest < matrix.length-1; colIndexNest++) {
-                if(colIndexNest != colIndex){
-                     
-                    
+            
+            int count = 0;
+            for(int colIndexNest = 0; colIndexNest < matrix.length; colIndexNest++) {
+                print("Col Index Nest " + colIndexNest);
+                if(colIndexNest != colIndex){        
                                                         //This is getting the row not the column!!!
-                    int[] res = slice(1, matrix.length-1, getCol(matrix, colIndexNest));
-                    newMatrix[colIndexNest] = res;
-                    System.out.println("res[0], matrix[colIndexNest][0] ---- " + res[0] +" "+ matrix[colIndexNest][0]);
-                    System.out.println("res[1], matrix[colIndexNest][1] ---- " + res[1] +" "+ matrix[colIndexNest][1]);
-                    System.out.println("matrix[colIndexNest][2] ----- " + matrix[colIndexNest][2]  );
-                  
+                    int[] res = Determinant.slice(1, matrix.length-1, matrix, colIndexNest);
+                    newMatrix[count] = res;
+                    
+                    print2(newMatrix);
+                    print("++++++++"); 
+                    count++;
                 }
             }
-            //HOW ARE ZEROS BEING INTRODUCED???
             
             //The scalers are right. The sizes are right.... now the matrix elements need to be corrected
             
@@ -116,28 +121,29 @@ public class Determinant{
       return matrix;
     }
   
-  public static int[] slice(int start, int end, int[] array) {
+  public static int[] slice(int start, int end, int[][] array, int column) {
       int range = (end) - start;
       int[] result = new int[range+1];
-      for (int index = 0; index< range; index++){
-          result[index] = array[start+index];
+      
+      for (int index = 0; index< range + 1; index++){
+          result[index] = array[start+index][column];
       }
-      
-      
-      
       return result;
       
   }
+   
   
-  public static int[] getCol(int[][] matrix,int colOfInterest){
-      int[] result = new int[matrix.length];
-         for(int row = 0; row < matrix.length; row++) {
-        result[row] = matrix[row][colOfInterest];
-    }
-         return result;
+  public static void print2(int[][] array){
+      System.out.println(Arrays.deepToString(array));
   }
   
+  public static void print1(int[] array){
+      System.out.println(Arrays.toString(array));
+  }
   
+  public static void print(String s){
+      System.out.println(s);
+  }
   
 
 }  
