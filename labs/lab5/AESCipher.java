@@ -1,4 +1,5 @@
 
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 
@@ -210,6 +211,8 @@ public class AESCipher {
   }
   
   public static String[][] AESMixColumn(String[][] inStateHex){
+      
+      System.out.println(Arrays.deepToString(inStateHex));
       String[][] matBox = {{"00000010","00000011","00000001","00000001"}
                           ,{"00000001","00000010","00000011","00000001"}
                           ,{"00000001","00000001","00000010","00000011"}
@@ -231,6 +234,7 @@ public class AESCipher {
       for(int i =0; i<4;i++){
           for(int j =0; j<4; j++){
               int decimal = Integer.parseInt(resultHexSub[j][i],2);
+              
                resultHex[i][j] = Integer.toString(decimal,16);
           }
       }
@@ -243,33 +247,40 @@ public class AESCipher {
   //Addition = xor
   //multiplication = complicated mult
       public static String[] multiplyWithForLoops(String[][] matrix, String[] vector) {
+       
        String[] result = new String[4];
        for(int matRow = 0; matRow<4; matRow++){
            String[] colSub = new String[4];
            for(int col = 0; col<4; col++){
                if(matrix[matRow][col].matches("00000001")){
-                  colSub[col] = vector[col]; 
+                  colSub[col] = vector[col];
                }else if(matrix[matRow][col].matches("00000010")){
                    colSub[col] = binXOr(vector[col].substring(1)+"0", "00011011");
-               }else if(matrix[matRow][col].matches("00000011") && vector[col].charAt(0) == '1'){
-                   //Its only correct sometimes...
-                   colSub[col] = binXOr(vector[col].substring(1) + "0", vector[col]);
+               //}else if(matrix[matRow][col].matches("00000011") &&  (vector[col].charAt(0) == '0' ^ vector[col].charAt(4) == '1') ){
+               }else if(matrix[matRow][col].matches("00000011") &&  vector[col].charAt(0) == '1' /*&& vector[col] == "11101011" */){
+                   colSub[col] = binXOr(binXOr(vector[col].substring(1) + "0","00011011"), vector[col]);
                }else{
-                   colSub[col] = binXOr(vector[col].substring(1)+"0", vector[col]);
+                   colSub[col] = binXOr(vector[col].substring(1) + "0",vector[col]);
                }
            }
            //Now xor everything
+           
+           System.out.println("XORED: " + colSub[0] + " , " + colSub[1] +  " , " + colSub[2] + " , " + colSub[3]);
+           System.out.println(binXOr(binXOr(binXOr(colSub[0],colSub[1]),colSub[2]),colSub[3]));
            result[matRow] = binXOr(binXOr(binXOr(colSub[0],colSub[1]),colSub[2]),colSub[3]);
        }   
-          
-        
         return result;
     }
   
+  //Problem scenarios:
+      //3 is in col 1 (ie matRow 4)
+      // "10100000"
+      // "11101011"
+  
+  
   
 private static String binXOr(String value1, String value2) {
-    System.out.println(value1);
-    System.out.println(value2);
+    
     StringBuilder sb = new StringBuilder();
     for(int index = 0; index < value1.length(); index ++ ) {
       sb.append((value1.charAt(index) !=  value2.charAt(index)) ? 1 : 0);
