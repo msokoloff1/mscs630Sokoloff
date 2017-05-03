@@ -5,12 +5,13 @@
  */
 
 
-import java.util.Arrays;
+
 import java.util.Scanner;
 
 /*
-*Reads in 16 2-digit hex numbers from an external source
-*Then prints out the resulting 11 keys composed of 16 2-digit hex numbers
+*Reads in 16 2-digit hex numbers from an external source and some plain text
+*11 Keys are created and combined with the plain text to create the encrypted text
+*
 */
 
 public class DriverAES {
@@ -23,7 +24,7 @@ public class DriverAES {
     System.out.println("Hex Input: \n" + key );
     System.out.println("\n11 Resulting Keys: \n" + AESCipher.aesRoundKeys(key));
     System.out.println("Result:");
-    System.out.println(Arrays.deepToString(AESCipher.aes(pText, key)));
+    System.out.println(AESCipher.aes(pText, key));
     long elapsedInMS = (System.nanoTime() - startTime)/ 1000000;
     System.out.println("\nElapsed Time : " + elapsedInMS +" ms"); 
   } 

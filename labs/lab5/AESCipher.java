@@ -1,17 +1,11 @@
 
-import java.util.Arrays;
-import java.util.stream.IntStream;
-
-
 /*
  * @author Matthew Sokoloff
- * AES, Lab 4, MSCS630
+ * AES, Lab 5, MSCS630
  * AESCipher Class
  */
 
-
 public class AESCipher {
-    public static int called = 0;
   private static final String[][] S_BOX = {
    { "63", "7C", "77", "7B", "F2", "6B", "6F", "C5", "30", "01", "67", "2B", "FE", "D7", "AB", "76" },
    { "CA", "82", "C9", "7D", "FA", "59", "47", "F0", "AD", "D4", "A2", "AF", "9C", "A4", "72", "C0" },
@@ -49,10 +43,8 @@ public class AESCipher {
    { "C6", "97", "35", "6A", "D4", "B3", "7D", "FA", "EF", "C5", "91", "39", "72", "E4", "D3", "BD" },
    { "61", "C2", "9F", "25", "4A", "94", "33", "66", "CC", "83", "1D", "3A", "74", "E8", "CB", "8D" } 
   };
-    
-  
-  
-   public static int[] mc2 = {
+
+  private static final int[] mc2 = {
           0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e, 0x10, 0x12, 0x14, 0x16, 0x18, 0x1a, 0x1c, 0x1e,
           0x20, 0x22, 0x24, 0x26, 0x28, 0x2a, 0x2c, 0x2e, 0x30, 0x32, 0x34, 0x36, 0x38, 0x3a, 0x3c, 0x3e,
           0x40, 0x42, 0x44, 0x46, 0x48, 0x4a, 0x4c, 0x4e, 0x50, 0x52, 0x54, 0x56, 0x58, 0x5a, 0x5c, 0x5e,
@@ -69,9 +61,9 @@ public class AESCipher {
           0xbb, 0xb9, 0xbf, 0xbd, 0xb3, 0xb1, 0xb7, 0xb5, 0xab, 0xa9, 0xaf, 0xad, 0xa3, 0xa1, 0xa7, 0xa5,
           0xdb, 0xd9, 0xdf, 0xdd, 0xd3, 0xd1, 0xd7, 0xd5, 0xcb, 0xc9, 0xcf, 0xcd, 0xc3, 0xc1, 0xc7, 0xc5,
           0xfb, 0xf9, 0xff, 0xfd, 0xf3, 0xf1, 0xf7, 0xf5, 0xeb, 0xe9, 0xef, 0xed, 0xe3, 0xe1, 0xe7, 0xe5
-    };
-
-public static int[] mc3 = {   
+  };
+  
+  private static final int[] mc3 = {   
               0x00,0x03,0x06,0x05,0x0c,0x0f,0x0a,0x09,0x18,0x1b,0x1e,0x1d,0x14,0x17,0x12,0x11,
               0x30,0x33,0x36,0x35,0x3c,0x3f,0x3a,0x39,0x28,0x2b,0x2e,0x2d,0x24,0x27,0x22,0x21,
               0x60,0x63,0x66,0x65,0x6c,0x6f,0x6a,0x69,0x78,0x7b,0x7e,0x7d,0x74,0x77,0x72,0x71,
@@ -88,9 +80,7 @@ public static int[] mc3 = {
               0x6b,0x68,0x6d,0x6e,0x67,0x64,0x61,0x62,0x73,0x70,0x75,0x76,0x7f,0x7c,0x79,0x7a,
               0x3b,0x38,0x3d,0x3e,0x37,0x34,0x31,0x32,0x23,0x20,0x25,0x26,0x2f,0x2c,0x29,0x2a,
               0x0b,0x08,0x0d,0x0e,0x07,0x04,0x01,0x02,0x13,0x10,0x15,0x16,0x1f,0x1c,0x19,0x1a   
-    };
-  
-  
+  };
   
   /*
   *@param keyHex : 16 2-digit hex numbers
@@ -134,16 +124,20 @@ public static int[] mc3 = {
   }
   
 
+ /*
+  *@param matrix : A 4x4 square matrix
+  *Returns the transposed matrix
+  */ 
+  private static String[][] transpose(String[][] matrix) {
+    String[][] result = new String[4][4];
+      for(int i = 0; i < 4; i++) {
+        for(int j =0; j<4; j++) {
+          result[i][j] = matrix[j][i];
+        }
+      }
+    return result;
+  }
   
- private static String[][] transpose(String[][] matrix){
-     String[][] result = new String[4][4];
-     for(int i = 0; i < 4; i++){
-         for(int j =0; j<4; j++){
-             result[i][j] = matrix[j][i];
-         }
-     }
-     return result;
- }
   /*
   *@param keyMatrix : 16 2-digit hex numbers, in a 4x4 array
   *Returns a two dimensional array of containing all 11 keys
@@ -222,92 +216,115 @@ public static int[] mc3 = {
   }
   
  
-  public static String[][] AESStateXOR(String[][] sHex,String[][] keyHex){
-      String[][] results = new String[4][4];
-      for(int i = 0; i < 4; i++){
-          for(int j = 0; j<4; j++){
-              results[j][i] = xOr(sHex[j][i], keyHex[i][j]);
-          }
+  /*
+  *@param sHex    : input String
+  *@param keyHex : input key
+  * Returns the xored string with the correct key
+  */
+  public static String[][] AESStateXOR(String[][] sHex,String[][] keyHex) {
+    String[][] results = new String[4][4];
+    for(int i = 0; i < 4; i++) {
+      for(int j = 0; j<4; j++) {
+        results[j][i] = xOr(sHex[j][i], keyHex[i][j]);
       }
-      return results;
+    }
+    return results;
   }
   
-  public static String[][] AESNibbleSub(String[][] inStateHex){
-      String[][] result = new String[4][4];
-
-      for(int i=0; i<4; i++){
-          for(int j = 0; j<4;j++){
-              result[i][j] = aesSBox(inStateHex[i][j]);
-          }
-      }    
+  /*
+  *@param sHex    : input string
+  *@param keyHex : input key
+  * Returns the S Box Nibble substition on the input 
+  */
+  public static String[][] AESNibbleSub(String[][] inStateHex) {
+    String[][] result = new String[4][4];
+    for(int i=0; i<4; i++) {
+      for(int j = 0; j<4;j++) {
+        result[i][j] = aesSBox(inStateHex[i][j]);
+      }
+    }    
     return result;
   }
   
-  
-  public static String[][] AESShiftRow(String[][] inStateHex){
-     String[][] transposed = transpose(inStateHex);
-     String[][] result = new String[4][4];
-      result[0] = transposed[0];
-      for(int row = 1; row < 4; row++){
-          for(int col = 0; col<4; col++){
-              result[row][col] = transposed[row][(col+row)%4];
-          }
-      }      
-      return transpose(result);
-              
-    
+  /*
+  *@param inStateHex : 4x4 matrix to be shifted
+  *Returns a shifted form of the input. Each col is shifted by the row number
+  */
+  public static String[][] AESShiftRow(String[][] inStateHex) {
+    String[][] transposed = transpose(inStateHex);
+    String[][] result = new String[4][4];
+    result[0] = transposed[0];
+    for(int row = 1; row < 4; row++) {
+      for(int col = 0; col<4; col++) {
+        result[row][col] = transposed[row][(col+row)%4];
+      }
+    }      
+    return transpose(result);
   }
   
-
-   
-    public static String[][] aesMixColumn(String[][] inStateHex){
-      String[][] result = new String[4][4];
-      int[] a = new int[4];
-      int[] r = new int[4];
+  /*
+  *@param inStateHex : 4x4 matrix to be mixed
+  *Performs the lookup equivalent of the mix column operation
+  */
+  public static String[][] aesMixColumn(String[][] inStateHex) {
+    String[][] result = new String[4][4];
+    int[] a = new int[4];
+    int[] r = new int[4];
       
-      for (int i = 0; i < 4; i++){
-        for (int j = 0; j < 4; j++){
-          a[j] = Integer.parseInt(inStateHex[i][j], 16);
+    for (int i = 0; i < 4; i++) {
+      for (int j = 0; j < 4; j++) {
+        a[j] = Integer.parseInt(inStateHex[i][j], 16);
+      }
+        
+      r[0] = mc2[a[0]] ^ mc3[a[1]] ^ a[2] ^ a[3];
+      r[1] = a[0] ^ mc2[a[1]] ^ mc3[a[2]] ^ a[3];
+      r[2] = a[0] ^ a[1] ^ mc2[a[2]] ^ mc3[a[3]];
+      r[3] = mc3[a[0]] ^ a[1] ^ a[2] ^ mc2[a[3]];
+        
+      for (int k = 0; k < 4; k++) {
+        result[i][k] = Integer.toHexString( r[k]);
+      } 
+    }
+    return result;
+  }
+    
+  /*
+  *@param pTextHex : Plain text 
+  *@param keyHex : original key
+  * Returns the encrpyted plain text
+  */
+  public static String aes(String pTextHex,String keyHex) {
+    int NUM_NIBBLES = 2;
+    int squareMatrixDims = (int) Math.sqrt(pTextHex.length()/NUM_NIBBLES);
+    String[][] pTextHexMat = transpose(make2D(pTextHex,squareMatrixDims)); 
+    String[][] wMatrix = makeWMatrix(make2D(keyHex, squareMatrixDims));
+    String[][] enc = new String[4][4];
+    String[][] roundKey = (make2D(keyHex,squareMatrixDims));
+    enc = AESStateXOR(pTextHexMat, roundKey);
+      
+    for(int i = 1; i < 11; i++) {
+      for (int j = 0; j < 4; j++) {
+        for (int k = 0; k < 4; k ++) {
+          roundKey[k][j] = wMatrix[k][(i*4)+j];
         }
-        
-        r[0] = mc2[a[0]] ^ mc3[a[1]] ^ a[2] ^ a[3];
-        r[1] = a[0] ^ mc2[a[1]] ^ mc3[a[2]] ^ a[3];
-        r[2] = a[0] ^ a[1] ^ mc2[a[2]] ^ mc3[a[3]];
-        r[3] = mc3[a[0]] ^ a[1] ^ a[2] ^ mc2[a[3]];
-        
-        for (int k = 0; k < 4; k++){
-	  result[i][k] = Integer.toHexString( r[k]);
-	}
-      
       }
-      return result;
+      
+      enc = AESNibbleSub(enc);
+      enc = AESShiftRow(enc);
+      
+      if (i < 10)
+        enc = aesMixColumn(enc);
+      
+      enc = AESStateXOR(enc, roundKey);
     }
     
-
-    public static String[][] aes(String pTextHex,String inputKey){
-      String[][] pTextHexMat = transpose(make2D(pTextHex,4)); 
-      int NUM_NIBBLES = 2;
-      int squareMatrixDims = (int) Math.sqrt(pTextHex.length()/NUM_NIBBLES);
-      String[][] keyHex = makeWMatrix(make2D(inputKey, squareMatrixDims));
-      String[][] enc = new String[4][4];
-      String[][] roundKey = (make2D(inputKey,squareMatrixDims));
-      enc = AESStateXOR(pTextHexMat, roundKey);
-      
-      for(int i = 1; i < 11; i++){
-        for (int j = 0; j < 4; j++){
-          for (int k = 0; k < 4; k ++){
-            roundKey[k][j] = keyHex[k][(i*4)+j];
-          }
-        }	
-	  enc = AESNibbleSub(enc);
-          enc = AESShiftRow(enc);
-          if (i < 10){
-            enc = aesMixColumn(enc);
-          }
-          enc = AESStateXOR(enc, roundKey);
+    StringBuilder sb = new StringBuilder();
+    for (String[] row : enc) {
+      for(String col: row) {
+        sb.append(col);
       }
-      return enc;
     }
-    
+    return sb.toString();
+  } 
 }
 
