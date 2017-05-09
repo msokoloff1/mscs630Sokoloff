@@ -1,0 +1,11 @@
+Code is in multiple repositories. Each project was conducted as a seperate experiment.
+
+Code For Tree Parity Experiment:
+https://github.com/msokoloff1/ANN-Public-Key-Cryptography
+
+Our copy of the original Google Brain implementation:
+https://github.com/msokoloff1/Adversarial-Neural-Cryptography
+
+Our adjustments
+https://github.com/msokoloff1/Adaptive-Communication
+
