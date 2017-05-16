@@ -1,0 +1,15 @@
+34 pts
+
+The project attempts to make cryptographic adversarial networks.
+The idea has good merit. 
+
+However, there are some issues...
+Writeup:
+- It does not follow the structure required. Abstract, Introduction, etc. -1pt
+
+Code:
+- The repository contains no code available for grading. It just links to other
+  repositories for which I am not a contributor.  -5pts
+
+Overall:
+- The project is really cool. Are you interested in publishing this? 
